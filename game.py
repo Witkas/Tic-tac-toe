@@ -16,21 +16,25 @@ class TicTacToe:
         self.print_board(indices)
     
     def is_won(self):
+        # This function is used to check if all elements in column/row/diagonal match.
+        def check_all(list_of_lists):
+            for list_ in list_of_lists:
+                if all(spot == "X" for spot in list_) or all(spot == "O" for spot in list_):
+                    return True
+            return False
+        
         # Check rows
         rows = [self.board[i*3:(i+1)*3] for i in range(3)]  # E.g. [1,2,3,4,5,6,7,8,9] --> [[1,2,3],[4,5,6],[7,8,9]]
-        for row in rows:
-            if all(spot == "X" for spot in row) or all(spot == "O" for spot in row):
-                return True
+        if check_all(rows):
+            return True
         # Check columns
         columns = [[self.board[i] for i in range(len(self.board)) if i % 3 == j] for j in range(3)]
-        for column in columns:
-            if all(spot == "X" for spot in column) or all(spot == "O" for spot in column):
-                return True
+        if check_all(columns):
+            return True
         # Check diagonals
         diagonals = [[self.board[0], self.board[4], self.board[8]], [self.board[2], self.board[4] ,self.board[6]]]
-        for diagonal in diagonals:
-            if all(spot == "X" for spot in diagonal) or all(spot == "O" for spot in diagonal):
-                return True
+        if check_all(diagonals):
+            return True
 
         return False
 
