@@ -13,8 +13,8 @@ class RandomComputerPlayer(Player):
         super().__init__(letter)
     
     def get_move(self, game):
-        # Choose random spot on the board
-        return random.randint(0, 8)
+        # Choose random available spot on the board
+        return random.choice(game.get_available_spots())
 
 class HumanPlayer(Player):
     def __init__(self, letter):
@@ -23,5 +23,5 @@ class HumanPlayer(Player):
     def get_move(self, game):
         # User input
         choice = int(input("Select a square (1-9): "))
-        return choice-1
+        return choice - 1
     

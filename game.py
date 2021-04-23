@@ -34,7 +34,6 @@ class TicTacToe:
 
         return False
 
-
     def is_valid_move(self, move):
         # Move is valid if input is in range 0-8 and the spot on the board is empty.
         if move in range(9) and self.board[move] == " ":
@@ -60,6 +59,9 @@ class TicTacToe:
             return False
         else:
             return True
+
+    def get_available_spots(self):
+        return [i for (i, spot) in enumerate(self.board) if spot == " "]
 
     def play(self, player1, player2):
         # Print the indices of the board
