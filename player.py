@@ -22,21 +22,23 @@ class HumanPlayer(Player):
             return self.get_move(game)
 
 class ComputerPlayer(Player):
-    pass
-
-class RandomComputerPlayer(ComputerPlayer): 
     def get_move(self, game):
         # A brief pause before modifying the board
         print("Computer is making a move...")
-        time.sleep(0.5)
+        time.sleep(0.3)
+
+class RandomComputerPlayer(ComputerPlayer): 
+    def get_move(self, game):
+        super().get_move(game)
         # Choose random spot on the board
         return random.choice(game.get_available_spots())
 
 class GeniusComputerPlayer(ComputerPlayer):
     def __init__(self, letter):
         super().__init__(letter)
-        self.letter_copy = self.letter # Copy for comparison
+        self.letter_copy = self.letter # Copy used for later comparison
     def get_move(self, game):
+        super().get_move(game)
         if len(game.get_available_spots()) == 9:
             # Choose random spot on the board
             return random.choice(game.get_available_spots())
@@ -59,8 +61,6 @@ class GeniusComputerPlayer(ComputerPlayer):
 
         def get_game_state(game):
             winner = game.get_winner()
-            #game.print_board(game.board)
-            #print("winner = " + str(winner))
             if winner != None:
                 if winner == self:
                     return 1    # Computer wins
@@ -93,28 +93,17 @@ class GeniusComputerPlayer(ComputerPlayer):
         for possible_move in game.get_available_spots():
             # 1. Modify the board
             game.board[possible_move] = self.letter
-            #game.print_board(game.board)
             # 2. Simulate the game using recursion
-            #print("swap 1")
             self.letter = "O" if self.letter == "X" else "X"
             simulated_score = self.minimax(game, self)
-            #print("swap 2")
             self.letter = "O" if self.letter == "X" else "X"
-            # 3. Undo move
+            # 3. Undo the move
             game.board[possible_move] = " "
             game.current_winner = None
             simulated_score["position"] = possible_move
             # 4. Choose the best possible move
-            #print(f"Comparing {simulated_score['score']} and {best['score']} while {self.letter}")
             if self.letter == self.letter_copy and simulated_score["score"] > best["score"]:
                 best = simulated_score
             elif self.letter != self.letter_copy and simulated_score["score"] < best["score"]:
                 best = simulated_score
-            
-            #game.print_board(game.board)
-            #print("score = " + str(best["score"]))
-            #print("self.letter = " + self.letter)
-        #print(self.letter)
-        #print(self.letter_copy)
-        #self.letter = self.letter_copy
         return best      
