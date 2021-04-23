@@ -6,18 +6,18 @@ class TicTacToe:
         self.current_winner = None
 
     def print_board(self, board):
-        grouped_board = [board[i*3:(i+1)*3] for i in range(3)]  # E.g. [0,1,2,3,4,5,6,7,8] --> [[0,1,2],[3,4,5],[6,7,8]]
+        grouped_board = [board[i*3:(i+1)*3] for i in range(3)]  # E.g. [1,2,3,4,5,6,7,8,9] --> [[1,2,3],[4,5,6],[7,8,9]]
         for group in grouped_board:
             print("| " + " | ".join(group) + " |")  # Prints each row
 
     def print_board_indices(self):
         # Prints the arrangement of the indices on the board (used at the beginning of the game).
-        indices = [str(i) for i in range(9)]
+        indices = [str(i) for i in range(1,10)]
         self.print_board(indices)
     
     def is_won(self):
         # Check rows
-        rows = [self.board[i*3:(i+1)*3] for i in range(3)]  # E.g. [0,1,2,3,4,5,6,7,8] --> [[0,1,2],[3,4,5],[6,7,8]]
+        rows = [self.board[i*3:(i+1)*3] for i in range(3)]  # E.g. [1,2,3,4,5,6,7,8,9] --> [[1,2,3],[4,5,6],[7,8,9]]
         for row in rows:
             if all(spot == "X" for spot in row) or all(spot == "O" for spot in row):
                 return True
@@ -27,7 +27,7 @@ class TicTacToe:
             if all(spot == "X" for spot in column) or all(spot == "O" for spot in column):
                 return True
         # Check diagonals
-        diagonals = [[0,4,8], [2,4,6]]
+        diagonals = [[self.board[0], self.board[4], self.board[8]], [self.board[2], self.board[4] ,self.board[6]]]
         for diagonal in diagonals:
             if all(spot == "X" for spot in diagonal) or all(spot == "O" for spot in diagonal):
                 return True
@@ -45,7 +45,7 @@ class TicTacToe:
     def make_move(self, player):
         # Uses the Player class to make a move.
         try:
-            move = player.get_move()
+            move = player.get_move(self)
             if not self.is_valid_move(move):
                 raise ValueError
             # If the move is valid, modify the board
