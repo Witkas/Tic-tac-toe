@@ -91,7 +91,8 @@ class TicTacToe:
 
 
 if __name__ == "__main__":
-    x_player = RandomComputerPlayer("X")
+    x_player = GeniusComputerPlayer("X")
     o_player = HumanPlayer("O")
     game = TicTacToe(x_player, o_player)
+    #game.board = [" ", "O", "O", "X", "X", " ", " ", "X", "O"]
     game.play()

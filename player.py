@@ -22,25 +22,27 @@ class HumanPlayer(Player):
             return self.get_move(game)
 
 class ComputerPlayer(Player):
+    pass
+
+class RandomComputerPlayer(ComputerPlayer): 
     def get_move(self, game):
         # A brief pause before modifying the board
         print("Computer is making a move...")
         time.sleep(0.5)
-
-class RandomComputerPlayer(ComputerPlayer): 
-    def get_move(self, game):
-        super().get_move(game)
         # Choose random spot on the board
         return random.choice(game.get_available_spots())
 
 class GeniusComputerPlayer(ComputerPlayer):
+    def __init__(self, letter):
+        super().__init__(letter)
+        self.letter_copy = self.letter # Copy for comparison
     def get_move(self, game):
-        super().get_move(game)
         if len(game.get_available_spots()) == 9:
             # Choose random spot on the board
             return random.choice(game.get_available_spots())
         else:
-            return self.minimax(game, self.letter)["position"]
+            return self.minimax(game, self)["position"]
+            
     def minimax(self, game, current_player):
         # The computer will choose the best possible spot using the minimax algorithm.
         # I implement this algorithm using the following formula:
@@ -57,53 +59,62 @@ class GeniusComputerPlayer(ComputerPlayer):
 
         def get_game_state(game):
             winner = game.get_winner()
-            print("winner = " + str(winner))
-            if winner == self.letter:
-                return 1    # Computer wins
-            elif winner != None:
-                return -1   # Opponent wins
+            #game.print_board(game.board)
+            #print("winner = " + str(winner))
+            if winner != None:
+                if winner == self:
+                    return 1    # Computer wins
+                else:
+                    return -1   # Opponent wins
             elif game.is_board_full():
-                return 0    # Tie
+                return 0        # Tie
             else:
                 return None # Game not finished yet
-        
-        max_player = self.letter
-        other_player = "X" if current_player == "O" else "X"
 
         # Base case: game is finished either by win, loss or tie.
         game_state = get_game_state(game)
-        print("game_state = " + str(game_state))
         if game_state != None:
             return {
                 "position": None,
                 "score": game_state * (len(game.get_available_spots()) + 1)
             }
         
-        if current_player == max_player:
+        if self.letter == self.letter_copy:
             best = {
                 "position": None,
-                "score": -math.inf
+                "score": -math.inf  # We want to maximize the potential of our move
             }
         else:
             best = {
                 "position": None,
-                "score": math.inf
+                "score": math.inf   # The opponent will want to minimize the potential of their move
             }
 
         for possible_move in game.get_available_spots():
-            # 1. Make a move
-            game.make_move(current_player)
+            # 1. Modify the board
+            game.board[possible_move] = self.letter
+            #game.print_board(game.board)
             # 2. Simulate the game using recursion
-            simulated_score = self.minimax(game, other_player)
+            #print("swap 1")
+            self.letter = "O" if self.letter == "X" else "X"
+            simulated_score = self.minimax(game, self)
+            #print("swap 2")
+            self.letter = "O" if self.letter == "X" else "X"
             # 3. Undo move
             game.board[possible_move] = " "
             game.current_winner = None
             simulated_score["position"] = possible_move
             # 4. Choose the best possible move
-            if current_player == max_player and simulated_score > best["score"]:
-                best["score"] = simulated_score["score"]
-                best["position"] = simulated_score["position"]
-            elif current_player != max_player and simulated_score < best["score"]:
-                best["score"] = simulated_score["score"]
-                best["position"] = simulated_score["position"]
+            #print(f"Comparing {simulated_score['score']} and {best['score']} while {self.letter}")
+            if self.letter == self.letter_copy and simulated_score["score"] > best["score"]:
+                best = simulated_score
+            elif self.letter != self.letter_copy and simulated_score["score"] < best["score"]:
+                best = simulated_score
+            
+            #game.print_board(game.board)
+            #print("score = " + str(best["score"]))
+            #print("self.letter = " + self.letter)
+        #print(self.letter)
+        #print(self.letter_copy)
+        #self.letter = self.letter_copy
         return best      
