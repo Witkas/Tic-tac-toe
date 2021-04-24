@@ -87,7 +87,7 @@ class GeniusComputerPlayer(ComputerPlayer):
         else:
             best = {
                 "position": None,
-                "score": math.inf   # The opponent will want to minimize the potential of their move
+                "score": math.inf   # The opponent wants to minimize the potential of their move
             }
 
         for possible_move in game.get_available_spots():
@@ -105,5 +105,69 @@ class GeniusComputerPlayer(ComputerPlayer):
             if self.current_letter == self.letter and simulated_score["score"] > best["score"]:
                 best = simulated_score
             elif self.current_letter != self.letter and simulated_score["score"] < best["score"]:
+                best = simulated_score
+        return best
+
+class IdiotComputerPlayer(ComputerPlayer):
+    # Funny reversal of the logic behind the GeniusComputerPlayer.
+    # This player will try to lose deliberately.
+    def __init__(self, letter):
+        super().__init__(letter)
+        self.current_letter = self.letter # Used for simulating future games
+    def get_move(self, game):
+        super().get_move(game)
+        if len(game.get_available_spots()) == 9:
+            # Choose random spot on the board
+            return random.choice(game.get_available_spots())
+        else:
+            return self.minimax(game, self)["position"]
+            
+    def minimax(self, game, current_player):
+        def get_game_state(game):
+            winner = game.get_winner()
+            if winner != None:
+                if winner == self:
+                    return 1    # Computer wins
+                else:
+                    return -1   # Opponent wins
+            elif game.is_board_full():
+                return 0        # Tie
+            else:
+                return None # Game not finished yet
+
+        # Base case: game is finished either by win, loss or tie.
+        game_state = get_game_state(game)
+        if game_state != None:
+            return {
+                "position": None,
+                "score": game_state * (len(game.get_available_spots()) + 1)
+            }
+        
+        if self.current_letter == self.letter:
+            best = {
+                "position": None,
+                "score": math.inf  # We want to minimize the potential of our move
+            }
+        else:
+            best = {
+                "position": None,
+                "score": -math.inf   # The opponent wants to maximize the potential of their move
+            }
+
+        for possible_move in game.get_available_spots():
+            # 1. Modify the board
+            game.board[possible_move] = self.current_letter
+            # 2. Simulate the game using recursion
+            self.current_letter = "O" if self.current_letter == "X" else "X"
+            simulated_score = self.minimax(game, self)
+            self.current_letter = "O" if self.current_letter == "X" else "X"
+            # 3. Undo the move
+            game.board[possible_move] = " "
+            game.current_winner = None
+            simulated_score["position"] = possible_move
+            # 4. Choose the best possible move
+            if self.current_letter == self.letter and simulated_score["score"] < best["score"]:
+                best = simulated_score
+            elif self.current_letter != self.letter and simulated_score["score"] > best["score"]:
                 best = simulated_score
         return best      
