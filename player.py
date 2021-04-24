@@ -36,7 +36,7 @@ class RandomComputerPlayer(ComputerPlayer):
 class GeniusComputerPlayer(ComputerPlayer):
     def __init__(self, letter):
         super().__init__(letter)
-        self.letter_copy = self.letter # Copy used for later comparison
+        self.current_letter = self.letter # Used for simulating future games
     def get_move(self, game):
         super().get_move(game)
         if len(game.get_available_spots()) == 9:
@@ -79,7 +79,7 @@ class GeniusComputerPlayer(ComputerPlayer):
                 "score": game_state * (len(game.get_available_spots()) + 1)
             }
         
-        if self.letter == self.letter_copy:
+        if self.current_letter == self.letter:
             best = {
                 "position": None,
                 "score": -math.inf  # We want to maximize the potential of our move
@@ -92,18 +92,18 @@ class GeniusComputerPlayer(ComputerPlayer):
 
         for possible_move in game.get_available_spots():
             # 1. Modify the board
-            game.board[possible_move] = self.letter
+            game.board[possible_move] = self.current_letter
             # 2. Simulate the game using recursion
-            self.letter = "O" if self.letter == "X" else "X"
+            self.current_letter = "O" if self.current_letter == "X" else "X"
             simulated_score = self.minimax(game, self)
-            self.letter = "O" if self.letter == "X" else "X"
+            self.current_letter = "O" if self.current_letter == "X" else "X"
             # 3. Undo the move
             game.board[possible_move] = " "
             game.current_winner = None
             simulated_score["position"] = possible_move
             # 4. Choose the best possible move
-            if self.letter == self.letter_copy and simulated_score["score"] > best["score"]:
+            if self.current_letter == self.letter and simulated_score["score"] > best["score"]:
                 best = simulated_score
-            elif self.letter != self.letter_copy and simulated_score["score"] < best["score"]:
+            elif self.current_letter != self.letter and simulated_score["score"] < best["score"]:
                 best = simulated_score
         return best      
