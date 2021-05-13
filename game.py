@@ -1,4 +1,4 @@
-from player import *
+from player import HumanPlayer, RandomComputerPlayer, GeniusComputerPlayer, IdiotComputerPlayer
 
 class TicTacToe:
     def __init__(self, x_player, o_player):

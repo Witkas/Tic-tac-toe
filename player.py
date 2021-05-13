@@ -165,7 +165,7 @@ class IdiotComputerPlayer(ComputerPlayer):
             game.board[possible_move] = " "
             game.current_winner = None
             simulated_score["position"] = possible_move
-            # 4. Choose the best possible move
+            # 4. Choose the WORST possible move
             if self.current_letter == self.letter and simulated_score["score"] < best["score"]:
                 best = simulated_score
             elif self.current_letter != self.letter and simulated_score["score"] > best["score"]:
